@@ -121,14 +121,6 @@ export default function LandingPage() {
           <FloatingIcon icon="🗜️" label="ZIP" className="float-icon-6 bottom-32 right-[6%]" />
 
           <div className="relative max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium mb-8">
-              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-              <span>
-                {counterStarted
-                  ? `${(count / 1000000).toFixed(1)}M+ files converted securely`
-                  : "Over 2M files converted securely"}
-              </span>
-            </div>
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 gradient-text-subtle leading-[1.1]">
               The simple way to <br className="hidden md:block" />
@@ -237,7 +229,7 @@ export default function LandingPage() {
                     <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><GitHubIcon /></a>
                     <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><LinkedInIcon /></a>
                   </div>
-                  <p className="text-sm text-gray-500">Made with ❤️ by <span className="font-semibold text-gray-800">Ilham Saputra</span></p>
+                  <p className="text-sm text-gray-500">Made by <span className="font-semibold text-gray-800">Ilham Saputra</span></p>
                 </div>
               </div>
             </div>
