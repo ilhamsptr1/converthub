@@ -1,11 +1,14 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { FileDown, FileText, Image as ImageIcon, Lock, ShieldCheck, Music, Video, Star } from "@/components/icons";
 
 const tools = [
-  { title: "PDF to Word",    slug: "pdf-to-word",    desc: "Convert PDFs to editable Word documents.", icon: FileText, color: "#2563eb", bg: "#eff6ff" },
+  { title: "PDF to Word",    slug: "pdf-to-word",    desc: "Convert PDFs to editable Word documents.", icon: FileText, color: "#2563eb", bg: "#eff6ff", hot: true },
   { title: "Word to PDF",    slug: "word-to-pdf",    desc: "Create pixel-perfect PDFs from Word.",     icon: FileText, color: "#7c3aed", bg: "#f5f3ff" },
-  { title: "Compress PDF",   slug: "compress-pdf",   desc: "Reduce file size without losing quality.", icon: FileDown, color: "#dc2626", bg: "#fef2f2" },
+  { title: "Compress PDF",   slug: "compress-pdf",   desc: "Reduce file size without losing quality.", icon: FileDown, color: "#dc2626", bg: "#fef2f2", hot: true },
   { title: "Merge PDF",      slug: "merge-pdf",      desc: "Combine multiple PDFs into one file.",     icon: FileDown, color: "#ea580c", bg: "#fff7ed" },
   { title: "Split PDF",      slug: "split-pdf",      desc: "Extract pages from your PDF file.",        icon: FileText, color: "#059669", bg: "#ecfdf5" },
   { title: "Protect PDF",    slug: "protect-pdf",    desc: "Add a secure password to your PDF.",       icon: Lock,     color: "#e11d48", bg: "#fff1f2" },
@@ -17,7 +20,7 @@ const tools = [
   { title: "Compress Video", slug: "compress-video", desc: "Reduce video size for easy sharing.",      icon: Video,    color: "#9333ea", bg: "#faf5ff" },
 ];
 
-// Social media icons as inline SVG components
+// Social icons
 const InstagramIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
     <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
@@ -39,7 +42,44 @@ const LinkedInIcon = () => (
   </svg>
 );
 
+// Animated counter hook
+function useCounter(target: number, duration = 2000, start = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!start) return;
+    let startTime: number | null = null;
+    const step = (timestamp: number) => {
+      if (!startTime) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }, [start, target, duration]);
+  return count;
+}
+
+// Floating file icon component
+function FloatingIcon({ icon, label, className, style }: { icon: string; label: string; className: string; style?: React.CSSProperties }) {
+  return (
+    <div className={`absolute hidden lg:flex items-center gap-2 bg-white rounded-xl px-3 py-2 shadow-lg border border-gray-100 text-sm font-medium text-gray-700 select-none ${className}`} style={style}>
+      <span className="text-xl">{icon}</span>
+      <span>{label}</span>
+    </div>
+  );
+}
+
 export default function LandingPage() {
+  const heroRef = useRef<HTMLDivElement>(null);
+  const [counterStarted, setCounterStarted] = useState(false);
+  const count = useCounter(2000000, 2200, counterStarted);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setCounterStarted(true), 400);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#fafafa] text-[#09090b] selection:bg-black selection:text-white">
 
@@ -57,47 +97,50 @@ export default function LandingPage() {
             <Link href="/tools" className="hover:text-black transition-colors">All Tools</Link>
           </nav>
 
-          {/* Social Icons in Navbar */}
           <div className="flex items-center gap-4 text-gray-500">
-            <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors" aria-label="Instagram">
-              <InstagramIcon />
-            </a>
-            <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="TikTok">
-              <TikTokIcon />
-            </a>
-            <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="GitHub">
-              <GitHubIcon />
-            </a>
-            <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" aria-label="LinkedIn">
-              <LinkedInIcon />
-            </a>
+            <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors" aria-label="Instagram"><InstagramIcon /></a>
+            <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="TikTok"><TikTokIcon /></a>
+            <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="GitHub"><GitHubIcon /></a>
+            <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" aria-label="LinkedIn"><LinkedInIcon /></a>
           </div>
         </div>
       </header>
 
       <main className="flex-1 pt-16">
 
-        {/* HERO */}
-        <section className="relative pt-24 pb-32 px-6 overflow-hidden hero-pattern">
+        {/* ── HERO ─────────────────────────────────────── */}
+        <section ref={heroRef} className="relative pt-24 pb-32 px-6 overflow-hidden hero-pattern">
           <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
-          
+
+          {/* Floating file icons */}
+          <FloatingIcon icon="📄" label="PDF" className="float-icon-1 top-28 left-[8%]" />
+          <FloatingIcon icon="📝" label="DOCX" className="float-icon-2 top-44 left-[4%]" />
+          <FloatingIcon icon="🖼️" label="PNG" className="float-icon-3 top-28 right-[8%]" />
+          <FloatingIcon icon="🎵" label="MP3" className="float-icon-4 top-48 right-[4%]" />
+          <FloatingIcon icon="🎬" label="MP4" className="float-icon-5 bottom-32 left-[6%]" />
+          <FloatingIcon icon="🗜️" label="ZIP" className="float-icon-6 bottom-32 right-[6%]" />
+
           <div className="relative max-w-4xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white border border-gray-200 shadow-sm text-sm font-medium mb-8">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
-              Over 2 million files converted securely
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span>
+                {counterStarted
+                  ? `${(count / 1000000).toFixed(1)}M+ files converted securely`
+                  : "Over 2M files converted securely"}
+              </span>
             </div>
 
             <h1 className="text-5xl md:text-7xl font-bold tracking-tighter mb-6 gradient-text-subtle leading-[1.1]">
               The simple way to <br className="hidden md:block" />
               convert your files.
             </h1>
-            
+
             <p className="text-lg md:text-xl text-gray-500 mb-10 max-w-2xl mx-auto leading-relaxed">
               Professional-grade file conversion without the clutter. Drag, drop, and download in seconds. No installation required.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="text-base font-medium px-8 h-12 bg-black text-white hover:bg-gray-800 rounded-full shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
+              <Button asChild size="lg" className="dropzone-pulse-btn text-base font-medium px-8 h-12 bg-black text-white hover:bg-gray-800 rounded-full shadow-lg shadow-black/10 transition-transform hover:-translate-y-0.5">
                 <Link href="/tools">Explore all tools</Link>
               </Button>
             </div>
@@ -110,7 +153,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* TOOLS GRID */}
+        {/* ── TOOLS GRID ───────────────────────────────── */}
         <section className="py-24 px-6 bg-white">
           <div className="max-w-6xl mx-auto">
             <div className="mb-16 md:flex justify-between items-end">
@@ -127,8 +170,11 @@ export default function LandingPage() {
               {tools.map((tool, i) => (
                 <Link href={`/${tool.slug}`} key={i} className="block group">
                   <div className="premium-card p-6 h-full flex flex-col">
-                    <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 transition-transform group-hover:scale-110" style={{background: tool.bg}}>
-                      <tool.icon size={24} style={{color: tool.color}} />
+                    <div className="flex items-start justify-between mb-5">
+                      <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{background: tool.bg}}>
+                        <tool.icon size={24} style={{color: tool.color}} />
+                      </div>
+                      {tool.hot && <span className="badge-hot">🔥 Popular</span>}
                     </div>
                     <h3 className="font-semibold text-lg mb-2">{tool.title}</h3>
                     <p className="text-gray-500 text-sm leading-relaxed">{tool.desc}</p>
@@ -139,7 +185,23 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* FEATURES */}
+        {/* ── STATS STRIP ──────────────────────────────── */}
+        <section className="py-16 px-6 bg-black text-white">
+          <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
+            {[
+              { value: "2M+", label: "Files Converted" },
+              { value: "12", label: "Tools Available" },
+              { value: "100%", label: "Free to Use" },
+            ].map((stat, i) => (
+              <div key={i}>
+                <p className="text-4xl font-bold mb-1">{stat.value}</p>
+                <p className="text-gray-400 text-sm">{stat.label}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ── FEATURES ─────────────────────────────────── */}
         <section className="py-32 px-6">
           <div className="max-w-6xl mx-auto">
             <div className="grid md:grid-cols-2 gap-20 items-center">
@@ -150,44 +212,39 @@ export default function LandingPage() {
                 </p>
                 <div className="space-y-8">
                   {[
-                    { title: "End-to-end encryption", desc: "Your files are encrypted using AES-256 during transfer. No one can intercept them." },
-                    { title: "Automatic deletion", desc: "Every file you upload or convert is permanently purged from our servers after exactly one hour." },
-                    { title: "No data mining", desc: "We don't analyze, read, or sell the contents of your documents. Our business is conversion, not data." },
+                    { icon: "🔐", title: "End-to-end encryption", desc: "Your files are encrypted using AES-256 during transfer. No one can intercept them." },
+                    { icon: "🗑️", title: "Automatic deletion", desc: "Every file you upload or convert is permanently purged from our servers after exactly one hour." },
+                    { icon: "🚫", title: "No data mining", desc: "We don't analyze, read, or sell the contents of your documents. Our business is conversion, not data." },
                   ].map((f, i) => (
-                    <div key={i}>
-                      <h4 className="font-semibold text-lg mb-1">{f.title}</h4>
-                      <p className="text-gray-500">{f.desc}</p>
+                    <div key={i} className="flex gap-4">
+                      <span className="text-2xl mt-0.5">{f.icon}</span>
+                      <div>
+                        <h4 className="font-semibold text-lg mb-1">{f.title}</h4>
+                        <p className="text-gray-500">{f.desc}</p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-              
+
               <div className="relative">
                 <div className="absolute inset-0 bg-blue-50 blur-[100px] rounded-full" />
-                <div className="premium-card p-10 relative z-10 flex flex-col items-center justify-center text-center gap-4">
+                <div className="premium-card p-10 relative z-10 flex flex-col items-center justify-center text-center gap-6">
+                  <p className="font-bold text-lg text-gray-800">Find me on</p>
                   <div className="flex gap-4">
-                    <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
-                      <InstagramIcon />
-                    </a>
-                    <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
-                      <TikTokIcon />
-                    </a>
-                    <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
-                      <GitHubIcon />
-                    </a>
-                    <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
-                      <LinkedInIcon />
-                    </a>
+                    <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><InstagramIcon /></a>
+                    <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><TikTokIcon /></a>
+                    <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><GitHubIcon /></a>
+                    <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><LinkedInIcon /></a>
                   </div>
-                  <p className="font-semibold text-gray-800 mt-2">Made by Ilham Saputra</p>
-                  <p className="text-sm text-gray-500">Follow me on social media for updates!</p>
+                  <p className="text-sm text-gray-500">Made with ❤️ by <span className="font-semibold text-gray-800">Ilham Saputra</span></p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA */}
+        {/* ── CTA ──────────────────────────────────────── */}
         <section className="py-32 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold tracking-tight mb-6">Ready to streamline your work?</h2>
@@ -199,18 +256,14 @@ export default function LandingPage() {
         </section>
       </main>
 
-      {/* FOOTER */}
+      {/* ── FOOTER ───────────────────────────────────── */}
       <footer className="border-t border-gray-200 bg-white py-10 px-6">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-2.5">
             <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-white font-bold text-xs">I</div>
             <span className="font-semibold">Iconvert</span>
           </div>
-
-          <p className="text-sm text-gray-400 text-center">
-            © {new Date().getFullYear()} Ilham Saputra
-          </p>
-
+          <p className="text-sm text-gray-400 text-center">© {new Date().getFullYear()} Ilham Saputra</p>
           <div className="flex items-center gap-4 text-gray-400">
             <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors"><InstagramIcon /></a>
             <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><TikTokIcon /></a>
