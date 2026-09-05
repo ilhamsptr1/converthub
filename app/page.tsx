@@ -63,7 +63,7 @@ function useCounter(target: number, duration = 2000, start = false) {
 // Floating file icon component
 function FloatingIcon({ icon, label, className, style }: { icon: string; label: string; className: string; style?: React.CSSProperties }) {
   return (
-    <div className={`absolute hidden lg:flex items-center gap-2 bg-white rounded-xl px-3 py-2 shadow-lg border border-gray-100 text-sm font-medium text-gray-700 select-none ${className}`} style={style}>
+    <div className={`absolute hidden lg:flex items-center gap-2 glass-float px-3 py-2 text-sm font-medium text-gray-700 select-none ${className}`} style={style}>
       <span className="text-xl">{icon}</span>
       <span>{label}</span>
     </div>
@@ -81,13 +81,13 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#fafafa] text-[#09090b] selection:bg-black selection:text-white">
+    <div className="flex flex-col min-h-screen bg-[#f8f8fa] text-[#09090b] selection:bg-black selection:text-white">
 
-      {/* HEADER */}
-      <header className="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-lg border-b border-black/5">
+      {/* HEADER — liquid glass nav */}
+      <header className="fixed top-0 w-full z-50 glass-nav">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded bg-black flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors">
+            <div className="w-8 h-8 rounded-lg bg-black flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors shadow-md">
               I
             </div>
             <span className="text-[1.1rem] font-bold tracking-tight">Iconvert</span>
@@ -110,7 +110,11 @@ export default function LandingPage() {
 
         {/* ── HERO ─────────────────────────────────────── */}
         <section ref={heroRef} className="relative pt-24 pb-32 px-6 overflow-hidden hero-pattern">
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#fafafa] pointer-events-none" />
+          {/* Liquid gradient orbs */}
+          <div className="liquid-orb orb-blue orb-animate w-96 h-96 top-0 -left-24" />
+          <div className="liquid-orb orb-purple orb-animate-slow w-80 h-80 top-10 -right-16" />
+          <div className="liquid-orb orb-pink w-64 h-64 bottom-0 left-1/3" style={{opacity:0.2, filter:'blur(60px)'}} />
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#f8f8fa] pointer-events-none" />
 
           {/* Floating file icons */}
           <FloatingIcon icon="📄" label="PDF" className="float-icon-1 top-28 left-[8%]" />
@@ -161,7 +165,7 @@ export default function LandingPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {tools.map((tool, i) => (
                 <Link href={`/${tool.slug}`} key={i} className="block group">
-                  <div className="premium-card p-6 h-full flex flex-col">
+                  <div className="premium-card shimmer-card p-6 h-full flex flex-col">
                     <div className="flex items-start justify-between mb-5">
                       <div className="w-12 h-12 rounded-xl flex items-center justify-center transition-transform group-hover:scale-110" style={{background: tool.bg}}>
                         <tool.icon size={24} style={{color: tool.color}} />
@@ -178,15 +182,16 @@ export default function LandingPage() {
         </section>
 
         {/* ── STATS STRIP ──────────────────────────────── */}
-        <section className="py-16 px-6 bg-black text-white">
-          <div className="max-w-4xl mx-auto grid grid-cols-3 gap-8 text-center">
+        <section className="py-16 px-6 relative overflow-hidden">
+          <div className="liquid-orb orb-purple w-96 h-48 -top-10 left-1/4" style={{opacity:0.15, filter:'blur(50px)'}} />
+          <div className="max-w-4xl mx-auto glass-dark rounded-3xl py-12 px-8 grid grid-cols-3 gap-8 text-center relative z-10">
             {[
               { value: "2M+", label: "Files Converted" },
               { value: "12", label: "Tools Available" },
               { value: "100%", label: "Free to Use" },
             ].map((stat, i) => (
               <div key={i}>
-                <p className="text-4xl font-bold mb-1">{stat.value}</p>
+                <p className="text-4xl font-bold mb-1 text-white">{stat.value}</p>
                 <p className="text-gray-400 text-sm">{stat.label}</p>
               </div>
             ))}
@@ -220,8 +225,8 @@ export default function LandingPage() {
               </div>
 
               <div className="relative">
-                <div className="absolute inset-0 bg-blue-50 blur-[100px] rounded-full" />
-                <div className="premium-card p-10 relative z-10 flex flex-col items-center justify-center text-center gap-6">
+                <div className="liquid-orb orb-blue orb-animate w-72 h-72 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" style={{opacity:0.25}} />
+                <div className="glass glass-glow rounded-3xl p-10 relative z-10 flex flex-col items-center justify-center text-center gap-6">
                   <p className="font-bold text-lg text-gray-800">Find me on</p>
                   <div className="flex gap-4">
                     <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md"><InstagramIcon /></a>
