@@ -27,9 +27,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded bg-black flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors">
-              C
+              I
             </div>
-            <span className="text-[1.1rem] font-bold tracking-tight">ConvertHub</span>
+            <span className="text-[1.1rem] font-bold tracking-tight">Iconvert</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
@@ -147,7 +147,7 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <p className="text-lg font-medium leading-relaxed mb-6">
-                    "As someone handling NDAs and contracts daily, I needed a tool I could actually trust. ConvertHub's auto-delete policy and clean interface makes it the only converter I use."
+                    "As someone handling NDAs and contracts daily, I needed a tool I could actually trust. Iconvert's auto-delete policy and clean interface makes it the only converter I use."
                   </p>
                   <div className="flex gap-1 text-yellow-400">
                     <Star size={20} fill="currentColor" />
@@ -206,7 +206,7 @@ export default function LandingPage() {
         <section className="py-32 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold tracking-tight mb-6">Ready to streamline your work?</h2>
-            <p className="text-gray-500 text-lg mb-10">Join over 2 million users who trust ConvertHub daily.</p>
+            <p className="text-gray-500 text-lg mb-10">Join over 2 million users who trust Iconvert daily.</p>
             <Button asChild size="lg" className="text-base font-medium px-10 h-12 bg-black text-white hover:bg-gray-800 rounded-full shadow-lg">
               <Link href="/tools">Get started now</Link>
             </Button>
@@ -220,8 +220,8 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
             <div className="col-span-2">
               <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-white font-bold text-xs">C</div>
-                <span className="font-semibold">ConvertHub</span>
+                <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-white font-bold text-xs">I</div>
+                <span className="font-semibold">Iconvert</span>
               </div>
               <p className="text-sm text-gray-500 max-w-xs">
                 The professional toolkit for all your file conversion needs. Built for speed, designed for privacy.
@@ -247,7 +247,7 @@ export default function LandingPage() {
           </div>
 
           <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-            <p>© {new Date().getFullYear()} ConvertHub Inc. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} Iconvert Inc. All rights reserved.</p>
             <p>San Francisco, CA</p>
           </div>
         </div>

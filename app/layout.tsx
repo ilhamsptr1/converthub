@@ -6,7 +6,7 @@ import { Analytics } from "@/components/analytics";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
-  title: "ConvertHub - Convert Anything, Instantly",
+  title: "Iconvert - Convert Anything, Instantly",
   description: "Fast, secure, AI-powered file conversion — free.",
 };
 

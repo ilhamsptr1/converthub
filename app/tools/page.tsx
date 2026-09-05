@@ -36,7 +36,7 @@ export default function ToolsDirectory() {
     <div className="flex flex-col min-h-screen bg-background">
       {/* Header (Simplified for Tools Page) */}
       <header className="flex items-center justify-between px-6 py-4 border-b bg-background/80 backdrop-blur-md sticky top-0 z-50">
-        <Link href="/" className="text-xl font-bold tracking-tight">ConvertHub</Link>
+        <Link href="/" className="text-xl font-bold tracking-tight">Iconvert</Link>
         <div className="flex items-center space-x-4">
           <Button variant="ghost" asChild><Link href="/app">Dashboard</Link></Button>
         </div>

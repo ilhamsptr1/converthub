@@ -67,7 +67,7 @@ export async function generateMetadata({ params }: { params: Promise<{ tool: str
   }
   const title = toolTitles[resolvedParams.tool] || "Tool";
   return {
-    title: `${title} | ConvertHub`,
+    title: `${title} | Iconvert`,
     description: toolDescriptions[resolvedParams.tool] || `Free online ${title} converter.`,
     alternates: { canonical: `/${resolvedParams.tool}` }
   };
@@ -97,9 +97,9 @@ export default async function ConverterPage({ params }: { params: Promise<{ tool
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded bg-black flex items-center justify-center text-white font-bold text-lg group-hover:bg-gray-800 transition-colors">
-              C
+              I
             </div>
-            <span className="text-[1.1rem] font-bold tracking-tight">ConvertHub</span>
+            <span className="text-[1.1rem] font-bold tracking-tight">Iconvert</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
@@ -149,7 +149,7 @@ export default async function ConverterPage({ params }: { params: Promise<{ tool
       
       {/* FOOTER */}
       <footer className="border-t border-gray-200 bg-white py-8 px-6 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} ConvertHub Inc. All rights reserved.
+        © {new Date().getFullYear()} Iconvert Inc. All rights reserved.
       </footer>
     </div>
   );

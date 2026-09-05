@@ -20,7 +20,7 @@ export default function DashboardLayout({
       {/* Sidebar */}
       <aside className="w-64 bg-background border-r flex flex-col hidden md:flex sticky top-0 h-screen">
         <div className="p-6 border-b">
-          <Link href="/" className="text-xl font-bold tracking-tight">ConvertHub</Link>
+          <Link href="/" className="text-xl font-bold tracking-tight">Iconvert</Link>
         </div>
         
         <nav className="flex-1 p-4 flex flex-col gap-2">
@@ -82,7 +82,7 @@ export default function DashboardLayout({
       {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <header className="h-16 border-b bg-background flex items-center justify-between px-6 md:hidden">
-          <Link href="/" className="font-bold tracking-tight">ConvertHub</Link>
+          <Link href="/" className="font-bold tracking-tight">Iconvert</Link>
           <Button variant="ghost" size="icon">
             <Avatar className="h-8 w-8">
               <AvatarFallback>US</AvatarFallback>
