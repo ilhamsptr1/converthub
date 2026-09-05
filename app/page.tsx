@@ -59,16 +59,16 @@ export default function LandingPage() {
 
           {/* Social Icons in Navbar */}
           <div className="flex items-center gap-4 text-gray-500">
-            <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors" aria-label="Instagram">
+            <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors" aria-label="Instagram">
               <InstagramIcon />
             </a>
-            <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="TikTok">
+            <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="TikTok">
               <TikTokIcon />
             </a>
             <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="GitHub">
               <GitHubIcon />
             </a>
-            <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" aria-label="LinkedIn">
               <LinkedInIcon />
             </a>
           </div>
@@ -166,16 +166,16 @@ export default function LandingPage() {
                 <div className="absolute inset-0 bg-blue-50 blur-[100px] rounded-full" />
                 <div className="premium-card p-10 relative z-10 flex flex-col items-center justify-center text-center gap-4">
                   <div className="flex gap-4">
-                    <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                    <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
                       <InstagramIcon />
                     </a>
-                    <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                    <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
                       <TikTokIcon />
                     </a>
                     <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
                       <GitHubIcon />
                     </a>
-                    <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                    <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
                       <LinkedInIcon />
                     </a>
                   </div>
@@ -212,10 +212,10 @@ export default function LandingPage() {
           </p>
 
           <div className="flex items-center gap-4 text-gray-400">
-            <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors"><InstagramIcon /></a>
-            <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><TikTokIcon /></a>
+            <a href="https://www.instagram.com/ilhammsptra_/" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors"><InstagramIcon /></a>
+            <a href="https://www.tiktok.com/@ninetofive925" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><TikTokIcon /></a>
             <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><GitHubIcon /></a>
-            <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors"><LinkedInIcon /></a>
+            <a href="https://www.linkedin.com/in/ilham-saputra-61003b32a/" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors"><LinkedInIcon /></a>
           </div>
         </div>
       </footer>
