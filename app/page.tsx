@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { FileDown, FileText, Image as ImageIcon, Lock, ShieldCheck, Music, Video, Star } from "@/components/icons";
 
 const tools = [
@@ -18,6 +17,28 @@ const tools = [
   { title: "Compress Video", slug: "compress-video", desc: "Reduce video size for easy sharing.",      icon: Video,    color: "#9333ea", bg: "#faf5ff" },
 ];
 
+// Social media icons as inline SVG components
+const InstagramIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+  </svg>
+);
+const TikTokIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.5a8.18 8.18 0 0 0 4.78 1.52V6.57a4.85 4.85 0 0 1-1.01.12z"/>
+  </svg>
+);
+const GitHubIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+  </svg>
+);
+const LinkedInIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+  </svg>
+);
+
 export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#fafafa] text-[#09090b] selection:bg-black selection:text-white">
@@ -34,17 +55,22 @@ export default function LandingPage() {
 
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-500">
             <Link href="/tools" className="hover:text-black transition-colors">All Tools</Link>
-            <Link href="/pricing" className="hover:text-black transition-colors">Pricing</Link>
-            <Link href="/about" className="hover:text-black transition-colors">About</Link>
           </nav>
 
-          <div className="flex items-center gap-4">
-            <Link href="/login" className="text-sm font-medium text-gray-500 hover:text-black transition-colors hidden sm:block">
-              Log in
-            </Link>
-            <Button asChild className="text-sm font-medium px-5 h-9 bg-black text-white hover:bg-gray-800 rounded-full">
-              <Link href="/signup">Sign up</Link>
-            </Button>
+          {/* Social Icons in Navbar */}
+          <div className="flex items-center gap-4 text-gray-500">
+            <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors" aria-label="Instagram">
+              <InstagramIcon />
+            </a>
+            <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="TikTok">
+              <TikTokIcon />
+            </a>
+            <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors" aria-label="GitHub">
+              <GitHubIcon />
+            </a>
+            <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors" aria-label="LinkedIn">
+              <LinkedInIcon />
+            </a>
           </div>
         </div>
       </header>
@@ -84,7 +110,7 @@ export default function LandingPage() {
           </div>
         </section>
 
-        {/* TOOLS GRID (Bento Box Style) */}
+        {/* TOOLS GRID */}
         <section className="py-24 px-6 bg-white">
           <div className="max-w-6xl mx-auto">
             <div className="mb-16 md:flex justify-between items-end">
@@ -138,66 +164,25 @@ export default function LandingPage() {
               
               <div className="relative">
                 <div className="absolute inset-0 bg-blue-50 blur-[100px] rounded-full" />
-                <div className="premium-card p-10 relative z-10">
-                  <div className="flex items-center gap-4 mb-8">
-                    <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center font-bold">M</div>
-                    <div>
-                      <h5 className="font-semibold">Markus</h5>
-                      <p className="text-sm text-gray-500">Legal Consultant</p>
-                    </div>
+                <div className="premium-card p-10 relative z-10 flex flex-col items-center justify-center text-center gap-4">
+                  <div className="flex gap-4">
+                    <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500 to-orange-400 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                      <InstagramIcon />
+                    </a>
+                    <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-black flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                      <TikTokIcon />
+                    </a>
+                    <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-gray-800 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                      <GitHubIcon />
+                    </a>
+                    <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center text-white hover:scale-110 transition-transform shadow-md">
+                      <LinkedInIcon />
+                    </a>
                   </div>
-                  <p className="text-lg font-medium leading-relaxed mb-6">
-                    "As someone handling NDAs and contracts daily, I needed a tool I could actually trust. Iconvert's auto-delete policy and clean interface makes it the only converter I use."
-                  </p>
-                  <div className="flex gap-1 text-yellow-400">
-                    <Star size={20} fill="currentColor" />
-                    <Star size={20} fill="currentColor" />
-                    <Star size={20} fill="currentColor" />
-                    <Star size={20} fill="currentColor" />
-                    <Star size={20} fill="currentColor" />
-                  </div>
+                  <p className="font-semibold text-gray-800 mt-2">Made by Ilham Saputra</p>
+                  <p className="text-sm text-gray-500">Follow me on social media for updates!</p>
                 </div>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* PRICING */}
-        <section className="py-24 px-6 bg-white border-y border-gray-100">
-          <div className="max-w-5xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold tracking-tight mb-4">Pricing that scales with you.</h2>
-              <p className="text-gray-500 text-lg">No hidden fees. Cancel anytime.</p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              {[
-                { name: "Basic", price: "Free", desc: "Perfect for occasional use.", btn: "Start for free", features: ["10 conversions / day", "100MB file limit", "Standard speed"] },
-                { name: "Pro", price: "$9", sub: "/mo", desc: "For heavy workflows.", btn: "Get Pro", features: ["Unlimited conversions", "2GB file limit", "Priority processing", "No ads"], highlight: true },
-                { name: "Teams", price: "$29", sub: "/seat", desc: "For organizations.", btn: "Contact sales", features: ["5GB file limit", "Centralized billing", "Dedicated support", "Custom retention"] },
-              ].map((p, i) => (
-                <div key={i} className={`p-8 rounded-2xl ${p.highlight ? 'bg-black text-white shadow-xl scale-105 relative z-10' : 'bg-white border border-gray-200'}`}>
-                  <h3 className={`font-semibold mb-2 ${p.highlight ? 'text-gray-300' : 'text-gray-500'}`}>{p.name}</h3>
-                  <div className="flex items-baseline gap-1 mb-4">
-                    <span className="text-4xl font-bold tracking-tight">{p.price}</span>
-                    {p.sub && <span className={p.highlight ? 'text-gray-400' : 'text-gray-500'}>{p.sub}</span>}
-                  </div>
-                  <p className={`text-sm mb-8 ${p.highlight ? 'text-gray-300' : 'text-gray-500'}`}>{p.desc}</p>
-                  
-                  <Button className={`w-full mb-8 rounded-full h-10 ${p.highlight ? 'bg-white text-black hover:bg-gray-100' : 'bg-black text-white hover:bg-gray-800'}`}>
-                    {p.btn}
-                  </Button>
-
-                  <ul className="space-y-4">
-                    {p.features.map((f, j) => (
-                      <li key={j} className="flex items-center gap-3 text-sm">
-                        <CheckIcon color={p.highlight ? "#fff" : "#000"} />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
             </div>
           </div>
         </section>
@@ -206,7 +191,7 @@ export default function LandingPage() {
         <section className="py-32 px-6 text-center">
           <div className="max-w-2xl mx-auto">
             <h2 className="text-4xl font-bold tracking-tight mb-6">Ready to streamline your work?</h2>
-            <p className="text-gray-500 text-lg mb-10">Join over 2 million users who trust Iconvert daily.</p>
+            <p className="text-gray-500 text-lg mb-10">Start converting files instantly — completely free.</p>
             <Button asChild size="lg" className="text-base font-medium px-10 h-12 bg-black text-white hover:bg-gray-800 rounded-full shadow-lg">
               <Link href="/tools">Get started now</Link>
             </Button>
@@ -215,51 +200,25 @@ export default function LandingPage() {
       </main>
 
       {/* FOOTER */}
-      <footer className="border-t border-gray-200 bg-white pt-16 pb-8 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-16">
-            <div className="col-span-2">
-              <div className="flex items-center gap-2.5 mb-4">
-                <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-white font-bold text-xs">I</div>
-                <span className="font-semibold">Iconvert</span>
-              </div>
-              <p className="text-sm text-gray-500 max-w-xs">
-                The professional toolkit for all your file conversion needs. Built for speed, designed for privacy.
-              </p>
-            </div>
-            
-            {[
-              { title: "Tools", links: ["PDF to Word", "Compress PDF", "Merge PDF", "All Tools"] },
-              { title: "Company", links: ["About", "Blog", "Careers", "Contact"] },
-              { title: "Legal", links: ["Privacy", "Terms", "Security"] },
-            ].map((col, i) => (
-              <div key={i}>
-                <h4 className="font-semibold text-sm mb-4">{col.title}</h4>
-                <ul className="space-y-3">
-                  {col.links.map((link, j) => (
-                    <li key={j}>
-                      <Link href="#" className="text-sm text-gray-500 hover:text-black transition-colors">{link}</Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+      <footer className="border-t border-gray-200 bg-white py-10 px-6">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="flex items-center gap-2.5">
+            <div className="w-6 h-6 rounded bg-black flex items-center justify-center text-white font-bold text-xs">I</div>
+            <span className="font-semibold">Iconvert</span>
           </div>
 
-          <div className="border-t border-gray-100 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-            <p>© {new Date().getFullYear()} Iconvert Inc. All rights reserved.</p>
-            <p>San Francisco, CA</p>
+          <p className="text-sm text-gray-400 text-center">
+            © {new Date().getFullYear()} Iconvert — Made with ❤️ by <span className="font-semibold text-gray-600">Ilham Saputra</span>
+          </p>
+
+          <div className="flex items-center gap-4 text-gray-400">
+            <a href="https://instagram.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-pink-500 transition-colors"><InstagramIcon /></a>
+            <a href="https://tiktok.com/@ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><TikTokIcon /></a>
+            <a href="https://github.com/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors"><GitHubIcon /></a>
+            <a href="https://linkedin.com/in/ilhamsptr1" target="_blank" rel="noopener noreferrer" className="hover:text-blue-600 transition-colors"><LinkedInIcon /></a>
           </div>
         </div>
       </footer>
     </div>
-  );
-}
-
-function CheckIcon({ color }: { color: string }) {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 6L9 17L4 12" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
   );
 }
