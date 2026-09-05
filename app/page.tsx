@@ -208,7 +208,7 @@ export default function LandingPage() {
           </div>
 
           <p className="text-sm text-gray-400 text-center">
-            © {new Date().getFullYear()} Iconvert — Made with ❤️ by <span className="font-semibold text-gray-600">Ilham Saputra</span>
+            © {new Date().getFullYear()} Ilham Saputra
           </p>
 
           <div className="flex items-center gap-4 text-gray-400">

@@ -149,7 +149,7 @@ export default async function ConverterPage({ params }: { params: Promise<{ tool
       
       {/* FOOTER */}
       <footer className="border-t border-gray-200 bg-white py-8 px-6 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Iconvert Inc. All rights reserved.
+        © {new Date().getFullYear()} Ilham Saputra
       </footer>
     </div>
   );
