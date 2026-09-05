@@ -1,0 +1,210 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum AuthProvider {
+  email
+  google
+  github
+}
+
+enum Plan {
+  free
+  pro
+  business
+  enterprise
+}
+
+enum SubscriptionStatus {
+  active
+  past_due
+  canceled
+}
+
+enum PaymentStatus {
+  succeeded
+  failed
+  refunded
+}
+
+enum FileStatus {
+  uploaded
+  processing
+  ready
+  expired
+  deleted
+}
+
+enum ConversionStatus {
+  queued
+  processing
+  completed
+  failed
+}
+
+model User {
+  id                 String       @id @default(uuid())
+  email              String       @unique
+  password_hash      String?
+  name               String
+  avatar_url         String?
+  auth_provider      AuthProvider
+  two_factor_enabled Boolean      @default(false)
+  plan_id            String?
+  created_at         DateTime     @default(now())
+  updated_at         DateTime     @updatedAt
+
+  files         File[]
+  conversions   Conversion[]
+  subscriptions Subscription?
+  payments      Payment[]
+  api_keys      ApiKey[]
+  favorites     Favorite[]
+  notifications Notification[]
+  history       History[]
+
+  @@map("users")
+}
+
+model File {
+  id                String     @id @default(uuid())
+  user_id           String?
+  original_filename String
+  storage_key       String
+  file_type         String
+  size_bytes        BigInt
+  status            FileStatus
+  expires_at        DateTime
+  created_at        DateTime   @default(now())
+
+  user User? @relation(fields: [user_id], references: [id], onDelete: SetNull)
+
+  source_conversions Conversion[] @relation("SourceFile")
+  result_conversions Conversion[] @relation("ResultFile")
+
+  @@index([user_id])
+  @@index([status])
+  @@index([expires_at])
+  @@map("files")
+}
+
+model Conversion {
+  id             String           @id @default(uuid())
+  user_id        String?
+  source_file_id String
+  result_file_id String?
+  tool           String
+  options        Json?
+  status         ConversionStatus
+  error_message  String?
+  started_at     DateTime         @default(now())
+  completed_at   DateTime?
+
+  user        User?     @relation(fields: [user_id], references: [id], onDelete: SetNull)
+  source_file File      @relation("SourceFile", fields: [source_file_id], references: [id], onDelete: Cascade)
+  result_file File?     @relation("ResultFile", fields: [result_file_id], references: [id], onDelete: SetNull)
+  history     History[]
+
+  @@index([user_id])
+  @@index([status])
+  @@map("conversions")
+}
+
+model Subscription {
+  id                     String             @id @default(uuid())
+  user_id                String             @unique
+  plan                   Plan               @default(free)
+  status                 SubscriptionStatus @default(active)
+  stripe_subscription_id String?
+  current_period_end     DateTime?
+  seats                  Int                @default(1)
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([status])
+  @@map("subscriptions")
+}
+
+model Payment {
+  id                String        @id @default(uuid())
+  user_id           String
+  stripe_payment_id String
+  amount_cents      Int
+  currency          String        @default("USD")
+  status            PaymentStatus
+  created_at        DateTime      @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+  @@map("payments")
+}
+
+model ApiKey {
+  id           String    @id @default(uuid())
+  user_id      String
+  key_hash     String
+  label        String
+  last_used_at DateTime?
+  revoked      Boolean   @default(false)
+  created_at   DateTime  @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([key_hash])
+  @@index([user_id])
+  @@map("api_keys")
+}
+
+model Log {
+  id         String   @id @default(uuid())
+  user_id    String?
+  event_type String
+  metadata   Json?
+  created_at DateTime @default(now())
+
+  @@map("logs")
+}
+
+model History {
+  id            String   @id @default(uuid())
+  user_id       String
+  conversion_id String
+  tool          String
+  file_name     String
+  created_at    DateTime @default(now())
+
+  user       User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  conversion Conversion @relation(fields: [conversion_id], references: [id], onDelete: Cascade)
+
+  @@map("history")
+}
+
+model Favorite {
+  id         String   @id @default(uuid())
+  user_id    String
+  tool       String
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("favorites")
+}
+
+model Notification {
+  id         String   @id @default(uuid())
+  user_id    String
+  type       String
+  message    String
+  read       Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
