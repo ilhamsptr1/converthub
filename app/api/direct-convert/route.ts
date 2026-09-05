@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
 
+// Increase max duration for large file processing on Vercel
+export const maxDuration = 60;
+
 // Helper: get file extension from file name
 function getExtension(filename: string): string {
   return filename.split(".").pop()?.toLowerCase() || "";
@@ -11,12 +14,14 @@ export async function POST(req: Request) {
     const tool = formData.get("tool") as string;
 
     if (!tool) {
-      return NextResponse.json({ error: "Missing tool" }, { status: 400 });
+      return NextResponse.json({ error: "Missing tool parameter" }, { status: 400 });
     }
 
     const secret = process.env.CONVERTAPI_SECRET;
     if (!secret) {
-      return NextResponse.json({ error: "ConvertAPI Secret not configured" }, { status: 500 });
+      return NextResponse.json({ 
+        error: "CONVERTAPI_SECRET environment variable is not set on this server. Please add it in Vercel Settings > Environment Variables." 
+      }, { status: 500 });
     }
 
     // ── MULTI-FILE TOOLS ────────────────────────────────────────────────────
@@ -46,17 +51,26 @@ export async function POST(req: Request) {
       );
       const data = await response.json();
       if (!response.ok) {
-        return NextResponse.json({ error: `ConvertAPI Error: ${JSON.stringify(data)}` }, { status: response.status });
+        console.error("ConvertAPI merge error:", data);
+        return NextResponse.json({ 
+          error: `ConvertAPI Error ${data.Code || response.status}: ${data.Message || JSON.stringify(data)}` 
+        }, { status: 500 });
       }
       const resultFile = data.Files?.[0];
-      if (!resultFile) return NextResponse.json({ error: "No file returned" }, { status: 500 });
+      if (!resultFile) return NextResponse.json({ error: "No file returned from merge" }, { status: 500 });
       return NextResponse.json({ success: true, url: resultFile.Url, fileName: resultFile.FileName, fileSize: resultFile.FileSize });
     }
 
     // ── SINGLE-FILE TOOLS ───────────────────────────────────────────────────
     const file = formData.get("file") as File;
     if (!file) {
-      return NextResponse.json({ error: "Missing file" }, { status: 400 });
+      return NextResponse.json({ error: "Missing file. Please select a file to convert." }, { status: 400 });
+    }
+
+    // Check file size - Vercel has 4.5MB limit by default
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > 20) {
+      return NextResponse.json({ error: `File too large (${fileSizeMB.toFixed(1)}MB). Maximum size is 20MB.` }, { status: 413 });
     }
 
     const arrayBuffer = await file.arrayBuffer();
@@ -79,7 +93,6 @@ export async function POST(req: Request) {
         break;
       case "compress-pdf":
         from = "pdf"; to = "compress";
-        // User provided preset or default to web
         parameters.push({ Name: "Preset", Value: formData.get("preset") || "web" });
         break;
       case "split-pdf":
@@ -91,7 +104,6 @@ export async function POST(req: Request) {
         break;
       case "protect-pdf":
         from = "pdf"; to = "encrypt";
-        // Get password from user input
         parameters.push({ Name: "UserPassword", Value: formData.get("password") || "1234" });
         break;
       case "jpg-to-png":
@@ -123,6 +135,7 @@ export async function POST(req: Request) {
     }
 
     const convertUrl = `https://v2.convertapi.com/convert/${from}/to/${to}?Secret=${secret}&StoreFile=true`;
+    console.log(`Converting with tool=${tool}, from=${from}, to=${to}, fileSize=${fileSizeMB.toFixed(2)}MB`);
 
     const response = await fetch(convertUrl, {
       method: "POST",
@@ -134,12 +147,14 @@ export async function POST(req: Request) {
 
     if (!response.ok) {
       console.error("ConvertAPI Error:", JSON.stringify(data));
-      return NextResponse.json({ error: `ConvertAPI Error: ${JSON.stringify(data)}` }, { status: response.status });
+      return NextResponse.json({ 
+        error: `ConvertAPI Error ${data.Code || response.status}: ${data.Message || "Unknown error from conversion service"}` 
+      }, { status: 500 });
     }
 
     const resultFile = data.Files?.[0];
     if (!resultFile) {
-      return NextResponse.json({ error: "No file returned from API" }, { status: 500 });
+      return NextResponse.json({ error: "Conversion succeeded but no output file was returned." }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -151,6 +166,8 @@ export async function POST(req: Request) {
 
   } catch (error: any) {
     console.error("Direct Convert API Error:", error);
-    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ 
+      error: error.message || "Internal server error. Please try again." 
+    }, { status: 500 });
   }
 }
