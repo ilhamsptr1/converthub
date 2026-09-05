@@ -98,12 +98,16 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string, co
         body: formData
       });
 
+      // Get the raw text first for better debugging
+      const responseText = await uploadRes.text();
+      let errData: any = {};
+      try { errData = JSON.parse(responseText); } catch { errData = { error: responseText || "Conversion failed" }; }
+      
       if (!uploadRes.ok) {
-        const errData = await uploadRes.json().catch(() => ({ error: "Conversion failed" }));
-        throw new Error(errData.error || "Conversion failed");
+        throw new Error(errData.error || `Server error (${uploadRes.status}): ${responseText.slice(0, 200)}`);
       }
 
-      const uploadData = await uploadRes.json();
+      const uploadData = errData;
 
       if (!uploadData.success || !uploadData.url) {
         throw new Error("Invalid response from API");
