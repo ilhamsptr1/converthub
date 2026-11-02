@@ -4,19 +4,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { FileDown, Loader2, CheckCircle2, AlertCircle, X, Settings } from "@/components/icons";
 import { Button } from "@/components/ui/button";
 
-const TOOL_MAP: Record<string, { from: string; to: string }> = {
-  "pdf-to-word":     { from: "pdf",  to: "docx" },
-  "word-to-pdf":     { from: "docx", to: "pdf" },
-  "compress-pdf":    { from: "pdf",  to: "compress" },
-  "split-pdf":       { from: "pdf",  to: "extract" },
-  "protect-pdf":     { from: "pdf",  to: "encrypt" },
-  "jpg-to-png":      { from: "jpg",  to: "png" },
-  "png-to-jpg":      { from: "png",  to: "jpg" },
-  "compress-image":  { from: "jpg",  to: "compress" },
-  "mp4-to-mp3":      { from: "mp4",  to: "mp3" },
-  "wav-to-mp3":      { from: "wav",  to: "mp3" },
-  "compress-video":  { from: "mp4",  to: "compress" },
-};
+// Tools that go through /api/convert (Cloudmersive engine)
+const SUPPORTED_TOOLS = new Set([
+  "pdf-to-word", "word-to-pdf", "compress-pdf",
+  "protect-pdf",
+  "jpg-to-png", "png-to-jpg", "compress-image",
+  "mp4-to-mp3", "wav-to-mp3",
+]);
 
 function getExt(f: string) { return f.split(".").pop()?.toLowerCase() || ""; }
 function fmtSize(bytes: number) {
@@ -51,24 +45,23 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
   const [status, setStatus] = useState<"idle" | "ready" | "uploading" | "success" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [progress, setProgress] = useState(0);
-  const [step, setStep] = useState(0);         // 0=select, 1=upload, 2=convert, 3=done
+  const [step, setStep] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
   const [resultSize, setResultSize] = useState<number | null>(null);
   const [originalSize, setOriginalSize] = useState<number>(0);
   const [eta, setEta] = useState<number | null>(null);
   const etaRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const downloadRef = useRef<{ blob: Blob; name: string } | null>(null);
 
   // Options
   const [password, setPassword] = useState("");
-  const [pageRange, setPageRange] = useState("");
   const [preset, setPreset] = useState("ebook");
 
-  const isMultiFile = toolId === "merge-pdf";
+  const isMultiFile = false; // merge not supported in this version
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      const selected = Array.from(e.target.files);
-      setFiles(prev => isMultiFile ? [...prev, ...selected] : [selected[0]]);
+      setFiles([e.target.files[0]]);
       setStatus("ready");
     }
   };
@@ -76,8 +69,7 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault(); setIsDragging(false);
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      const dropped = Array.from(e.dataTransfer.files);
-      setFiles(prev => isMultiFile ? [...prev, ...dropped] : [dropped[0]]);
+      setFiles([e.dataTransfer.files[0]]);
       setStatus("ready");
     }
   };
@@ -89,83 +81,72 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
   const startProcessing = async () => {
     if (files.length === 0) return;
     if (toolId === "protect-pdf" && !password) { alert("Please enter a password."); return; }
-    if (isMultiFile && files.length < 2) { alert("Please upload at least 2 files to merge."); return; }
 
-    const totalOriginal = files.reduce((s, f) => s + f.size, 0);
-    setOriginalSize(totalOriginal);
+    if (!SUPPORTED_TOOLS.has(toolId)) {
+      setErrorMessage(`Tool "${toolId}" is not available in this version.`);
+      setStatus("error");
+      return;
+    }
+
+    const file = files[0];
+    setOriginalSize(file.size);
     setStatus("uploading");
     setStep(1);
     setProgress(0);
 
-    // ETA countdown (estimate 15s total)
-    let etaSecs = 15;
+    // ETA countdown
+    let etaSecs = 20;
     setEta(etaSecs);
     etaRef.current = setInterval(() => {
       etaSecs = Math.max(1, etaSecs - 1);
       setEta(etaSecs);
     }, 1000);
 
-    // Animate progress
+    // Animate progress bar up to 85% while waiting
     const pid = setInterval(() => {
       setProgress(p => {
-        if (p >= 45) { setStep(2); }
-        if (p >= 90) { clearInterval(pid); return 90; }
-        return p + Math.random() * 7;
+        if (p >= 45) setStep(2);
+        if (p >= 85) { clearInterval(pid); return 85; }
+        return p + Math.random() * 5;
       });
-    }, 400);
+    }, 500);
 
     try {
-      const sigRes = await fetch("/api/sign");
-      if (!sigRes.ok) throw new Error("Could not get API credentials.");
-      const { secret } = await sigRes.json();
-      if (!secret) throw new Error("API secret not configured on server.");
+      const fd = new FormData();
+      fd.append("toolId", toolId);
+      fd.append("file", file, file.name);
+      if (toolId === "protect-pdf" && password) fd.append("password", password);
+      if (toolId.includes("compress")) fd.append("preset", preset);
 
-      let resultUrl = "";
-      let resultFileName = "";
-      let resultBytes: number | null = null;
-
-      if (toolId === "merge-pdf") {
-        const fd = new FormData();
-        files.forEach(f => fd.append("Files", f, f.name));
-        const res = await fetch(`https://v2.convertapi.com/convert/pdf/to/merge?Secret=${secret}&StoreFile=true`, { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok || !data.Files?.[0]) throw new Error(`ConvertAPI Error ${data.Code || res.status}: ${data.Message || "Merge failed"}`);
-        resultUrl = data.Files[0].Url;
-        resultFileName = data.Files[0].FileName;
-        resultBytes = data.Files[0].FileSize ?? null;
-      } else {
-        const file = files[0];
-        const ext = getExt(file.name);
-        const map = TOOL_MAP[toolId];
-        if (!map) throw new Error(`Tool "${toolId}" not supported.`);
-        let from = map.from;
-        if (toolId === "word-to-pdf") from = ext === "doc" ? "doc" : "docx";
-        if (toolId === "compress-image") from = ["jpg","jpeg"].includes(ext) ? "jpg" : ext || "jpg";
-        if (toolId === "compress-video") from = ext || "mp4";
-
-        const fd = new FormData();
-        fd.append("File", file, file.name);
-        if (toolId === "protect-pdf") fd.append("UserPassword", password);
-        if (toolId === "split-pdf" && pageRange) fd.append("PageRange", pageRange);
-        if (toolId.includes("compress")) fd.append("Preset", preset);
-        if (toolId === "png-to-jpg") fd.append("BackgroundColor", "white");
-
-        const res = await fetch(`https://v2.convertapi.com/convert/${from}/to/${map.to}?Secret=${secret}&StoreFile=true`, { method: "POST", body: fd });
-        const data = await res.json();
-        if (!res.ok || !data.Files?.[0]) throw new Error(`ConvertAPI Error ${data.Code || res.status}: ${data.Message || "Conversion failed"}`);
-        resultUrl = data.Files[0].Url;
-        resultFileName = data.Files[0].FileName;
-        resultBytes = data.Files[0].FileSize ?? null;
-      }
+      const res = await fetch("/api/convert", { method: "POST", body: fd });
 
       clearInterval(pid);
       if (etaRef.current) clearInterval(etaRef.current);
       setEta(null);
+
+      if (!res.ok) {
+        // Try to parse JSON error from our API
+        let errMsg = `Server error (${res.status})`;
+        const ct = res.headers.get("content-type") || "";
+        if (ct.includes("application/json")) {
+          const j = await res.json().catch(() => null);
+          if (j?.error) errMsg = j.error;
+        } else {
+          errMsg = await res.text().catch(() => errMsg);
+        }
+        throw new Error(errMsg);
+      }
+
+      const blob = await res.blob();
+      if (!blob || blob.size === 0) throw new Error("Received empty file from server. Please try again.");
+
+      const rawName = res.headers.get("X-Output-Filename");
+      const outName = rawName ? decodeURIComponent(rawName) : file.name.replace(/\.[^.]+$/, "") + "_converted";
+
+      downloadRef.current = { blob, name: outName };
+      setResultSize(blob.size);
       setProgress(100);
       setStep(3);
-      if (resultBytes !== null) setResultSize(resultBytes);
-      (window as any).__downloadUrl = resultUrl;
-      (window as any).__downloadName = resultFileName;
 
       setTimeout(() => {
         setStatus("success");
@@ -176,22 +157,28 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
       clearInterval(pid);
       if (etaRef.current) clearInterval(etaRef.current);
       setEta(null);
-      setErrorMessage(err.message || "Something went wrong.");
+      setErrorMessage(err.message || "Something went wrong. Please try again.");
       setStatus("error");
     }
   };
 
   const reset = () => {
     setFiles([]); setStatus("idle"); setProgress(0); setStep(0);
-    setErrorMessage(""); setPassword(""); setPageRange("");
+    setErrorMessage(""); setPassword("");
     setResultSize(null); setOriginalSize(0); setEta(null);
+    downloadRef.current = null;
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleDownload = () => {
-    const url = (window as any).__downloadUrl;
-    const name = (window as any).__downloadName || "converted-file";
-    if (url) { const a = document.createElement("a"); a.href = url; a.download = name; a.target = "_blank"; document.body.appendChild(a); a.click(); document.body.removeChild(a); }
+    if (!downloadRef.current) return;
+    const { blob, name } = downloadRef.current;
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // ── ERROR ─────────────────────────────────────────────────────────────────
@@ -217,7 +204,6 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
         <h3 className="text-2xl font-bold text-gray-900 mb-2">Done! 🎉</h3>
         <p className="text-gray-500 mb-2">Your file is ready to download.</p>
 
-        {/* File size comparison */}
         {resultSize !== null && originalSize > 0 && (
           <div className="flex items-center gap-3 text-sm mb-8 bg-gray-50 rounded-xl px-5 py-3 border border-gray-100">
             <span className="text-gray-500">{fmtSize(originalSize)}</span>
@@ -245,7 +231,6 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
     <div className="w-full bg-white rounded-xl border border-gray-200 flex flex-col items-center justify-center p-16 text-center shadow-sm">
       <Loader2 size={48} className="animate-spin mb-6" style={{ color }} />
 
-      {/* Step indicator */}
       <div className="flex items-center gap-2 mb-6">
         {STEPS.map((s, i) => (
           <React.Fragment key={i}>
@@ -261,9 +246,7 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
       <h3 className="text-xl font-bold text-gray-900 mb-1">
         {step === 1 ? "Uploading file..." : "Converting..."}
       </h3>
-      {eta !== null && (
-        <p className="text-gray-400 text-sm mb-6">~ {eta} seconds remaining</p>
-      )}
+      {eta !== null && <p className="text-gray-400 text-sm mb-6">~ {eta} seconds remaining</p>}
       {eta === null && <p className="text-gray-400 text-sm mb-6">Almost there...</p>}
 
       <div className="w-full max-w-sm">
@@ -281,8 +264,8 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
   if (status === "ready") return (
     <div className="w-full bg-white rounded-xl border border-gray-200 p-8 shadow-sm flex flex-col md:flex-row gap-8">
       <div className="flex-1">
-        <h3 className="font-semibold text-lg mb-4">Files to process ({files.length})</h3>
-        <div className="space-y-3 mb-6 max-h-[300px] overflow-y-auto pr-2">
+        <h3 className="font-semibold text-lg mb-4">File to convert</h3>
+        <div className="space-y-3 mb-6">
           {files.map((f, i) => (
             <div key={i} className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border border-gray-100">
               <div className="flex flex-col overflow-hidden">
@@ -293,9 +276,6 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
             </div>
           ))}
         </div>
-        {isMultiFile && (
-          <Button variant="outline" className="w-full border-dashed" onClick={() => fileInputRef.current?.click()}>+ Add more files</Button>
-        )}
       </div>
 
       <div className="md:w-72 flex flex-col justify-between bg-gray-50 rounded-xl p-6 border border-gray-100">
@@ -309,13 +289,6 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
               <input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none" />
             </div>
           )}
-          {toolId === "split-pdf" && (
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-600 mb-1">Page Range (Optional)</label>
-              <input type="text" value={pageRange} onChange={e => setPageRange(e.target.value)} placeholder="e.g. 1-5, 8, 11-13" className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none" />
-              <p className="text-[10px] text-gray-400 mt-1">Leave empty to split all pages.</p>
-            </div>
-          )}
           {toolId.includes("compress") && (
             <div className="mb-4">
               <label className="block text-xs font-medium text-gray-600 mb-1">Compression Level</label>
@@ -326,7 +299,7 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
               </select>
             </div>
           )}
-          {!["protect-pdf","split-pdf"].includes(toolId) && !toolId.includes("compress") && (
+          {toolId !== "protect-pdf" && !toolId.includes("compress") && (
             <p className="text-sm text-gray-500 mb-4">No extra options needed. Click convert to start.</p>
           )}
         </div>
@@ -334,7 +307,7 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
           Start Conversion ⚡
         </Button>
       </div>
-      <input ref={fileInputRef} type="file" multiple={isMultiFile} onChange={handleFileChange} className="hidden" />
+      <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
     </div>
   );
 
@@ -348,11 +321,11 @@ export function ToolDropzone({ toolId, color = "#2563eb" }: { toolId: string; co
       onDrop={handleDrop}
     >
       <Button className="dropzone-pulse-btn rounded-full font-bold text-lg px-12 py-8 mb-6 shadow-xl transition-transform hover:scale-105" style={{ backgroundColor: color, color: "white" }}>
-        Select {isMultiFile ? "files" : "a file"}
+        Select a file
       </Button>
-      <p className="text-gray-400 font-medium tracking-wide">or drag and drop {isMultiFile ? "files" : "a file"} here</p>
-      <p className="text-gray-300 text-sm mt-2">No account needed · Files deleted after 1 hour</p>
-      <input ref={fileInputRef} type="file" multiple={isMultiFile} onChange={handleFileChange} className="hidden" />
+      <p className="text-gray-400 font-medium tracking-wide">or drag and drop a file here</p>
+      <p className="text-gray-300 text-sm mt-2">No account needed · Files never stored on our servers</p>
+      <input ref={fileInputRef} type="file" onChange={handleFileChange} className="hidden" />
     </div>
   );
 }
